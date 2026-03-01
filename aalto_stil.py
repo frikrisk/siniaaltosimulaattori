@@ -40,6 +40,7 @@ plot_spot = st.empty()
 t = np.linspace(0, 2 * np.pi, 200)
 
 # 4. Animaatio-looppi
+# 4. Animaatio-looppi
 if st.session_state.run_animation:
     frame = 0
     while st.session_state.run_animation:
@@ -50,11 +51,11 @@ if st.session_state.run_animation:
         y2 = np.sin(v2 * (t + offset))
         y_sum = y1 + y2
         
-        # Luodaan DataFrame ja muokataan se "pitkään" muotoon värejä varten
+        # Luodaan DataFrame ja muokataan se värejä varten
         df = pd.DataFrame({'x': t, 'Aalto 1': y1, 'Aalto 2': y2, 'Summa': y_sum})
         df_melted = df.melt('x', var_name='Aalto', value_name='y')
         
-        # Piirretään Vega-Lite -kaavio (Nopein tapa pilvessä)
+        # Piirretään Vega-Lite -kaavio
         plot_spot.vega_lite_chart(df_melted, {
             'mark': {'type': 'line', 'clip': True},
             'encoding': {
@@ -72,8 +73,9 @@ if st.session_state.run_animation:
                     'field': 'Aalto',
                     'type': 'nominal',
                     'scale': {
-                    'domain': ['Aalto 1', 'Aalto 2', 'Summa'],
-                    'range': [color1, color2, 'black']
+                        'domain': ['Aalto 1', 'Aalto 2', 'Summa'],
+                        'range': [,,]
+                    }
                 }
             },
             'height': 450,
