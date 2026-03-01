@@ -54,7 +54,7 @@ if st.session_state.run_animation:
         plot_spot.line_chart(df)
         
         frame += 1
-        time.sleep(0.01) # Pienempi viive, koska line_chart on nopeampi
+        time.sleep(0.03) # Pienempi viive, koska line_chart on nopeampi
         
         # Streamlit tarvitsee pienen tauon säädinten tarkistamiseen
         if frame % 100 == 0:
