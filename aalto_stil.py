@@ -1,64 +1,68 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
+import plotly.graph_objects as go
 import time
 
-# 1. Sivun asetukset
 st.set_page_config(page_title="Aalto-laboratorio", layout="wide")
 
 if 'run_animation' not in st.session_state:
     st.session_state.run_animation = False
 
-st.title("🌊 Siniaaltojen simulaattori (Optimoitu)")
+st.title("🌊 Siniaaltojen simulaattori")
 
-# 2. Ohjauspaneeli
+# --- Ohjauspaneeli ---
 st.sidebar.header("⚙️ Ohjauspaneeli")
 if st.sidebar.button('▶️ Käynnistä / ⏸️ Pysäytä'):
     st.session_state.run_animation = not st.session_state.run_animation
 
 v1 = st.sidebar.slider("Aallonpituus 1", 0.1, 10.0, 1.95)
+color1 = st.sidebar.selectbox("Väri 1", ['blue', 'green', 'cyan', 'teal'], index=0)
+
+st.sidebar.divider()
+
 v2 = st.sidebar.slider("Aallonpituus 2", 0.1, 10.0, 2.82)
+color2 = st.sidebar.selectbox("Väri 2", ['red', 'magenta', 'orange', 'gold'], index=0)
 
-# 3. Mittaristot
-col1, col2 = st.columns(2)
-metric1 = col1.empty()
-metric2 = col2.empty()
+# Nopeuden säätö lennosta
+speed = st.sidebar.slider("Animaation nopeus", 0.01, 0.20, 0.05)
 
-# 4. Paikka kuvaajalle
 plot_spot = st.empty()
+t = np.linspace(0, 2 * np.pi, 400) # 400 pistettä on hyvä kompromissi
 
-# Valmistellaan data (300 pistettä riittää sulavuuteen)
-t = np.linspace(0, 2 * np.pi, 300)
+# --- Animaatio-looppi ---
+frame = 0
+while st.session_state.run_animation:
+    offset = frame * 0.1
+    y1 = np.sin(v1 * (t + offset))
+    y2 = np.sin(v2 * (t + offset))
+    y_sum = y1 + y2
 
-if st.session_state.run_animation:
-    frame = 0
-    while st.session_state.run_animation:
-        offset = frame * 0.1
-        
-        y1 = np.sin(v1 * (t + offset))
-        y2 = np.sin(v2 * (t + offset))
-        y_sum = y1 + y2
-        
-        # Luodaan DataFrame, jonka Streamlit osaa piirtää nopeasti
-        df = pd.DataFrame({
-            'Aalto 1': y1,
-            'Aalto 2': y2,
-            'Summa': y_sum
-        }, index=t)
-        
-        # Päivitetään mittarit ja kuvaaja
-        metric1.metric("Aalto 1", f"{v1:.2f} Hz")
-        metric2.metric("Aalto 2", f"{v2:.2f} Hz")
-        
-        # st.line_chart on huomattavasti nopeampi kuin plt.pyplot()
-        plot_spot.line_chart(df)
-        
-        frame += 1
-        time.sleep(0.03) # Pienempi viive, koska line_chart on nopeampi
-        
-        # Streamlit tarvitsee pienen tauon säädinten tarkistamiseen
-        if frame % 100 == 0:
-             # Tämä auttaa sovellusta pysymään responsiivisena
-             pass
-else:
-    plot_spot.info("Klikkaa 'Käynnistä' aloittaaksesi animaation.")
+    # Luodaan Plotly-kuvaaja
+    fig = go.Figure()
+    
+    # Aalto 1
+    fig.add_trace(go.Scatter(x=t, y=y1, name='Aalto 1', line=dict(color=color1, width=2)))
+    # Aalto 2
+    fig.add_trace(go.Scatter(x=t, y=y2, name='Aalto 2', line=dict(color=color2, width=2)))
+    # Summa (Katkoviivalla)
+    fig.add_trace(go.Scatter(x=t, y=y_sum, name='Summa', line=dict(color='black', width=2, dash='dash')))
+
+    fig.update_layout(
+        ylim=dict(range=[-2.5, 2.5]),
+        margin=dict(l=0, r=0, t=0, b=0),
+        height=400,
+        showlegend=True,
+        xaxis=dict(gridcolor='lightgray'),
+        yaxis=dict(gridcolor='lightgray'),
+        plot_bgcolor='white'
+    )
+
+    plot_spot.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+    
+    frame += 1
+    time.sleep(speed) # Käytetään sliderista tulevaa viivettä
+
+# Jos animaatio ei ole päällä, näytetään ohje
+if not st.session_state.run_animation:
+    st.info("Simulaattori on pysäytetty. Käynnistä animaatio sivupalkista.")
