@@ -56,10 +56,9 @@ if st.session_state.run:
                     'type': 'nominal',
                     'scale': {
                         'domain': ['Aalto 1', 'Aalto 2', 'Summa'],
-                        'scale': {
-                        'domain': ['Aalto 1', 'Aalto 2', 'Summa'],
-                        'range': ['blue', 'red', 'black']
+                        'range': [,,]
                     }
+                }
             },
             'height': 450
         }, use_container_width=True)
