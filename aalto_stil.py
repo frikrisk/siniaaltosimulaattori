@@ -49,12 +49,11 @@ while st.session_state.run_animation:
     fig.add_trace(go.Scatter(x=t, y=y_sum, name='Summa', line=dict(color='black', width=2, dash='dash')))
 
     fig.update_layout(
-        ylim=dict(range=[-2.5, 2.5]),
-        margin=dict(l=0, r=0, t=0, b=0),
+        yaxis=dict(range=[-2.5, 2.5], gridcolor='lightgray'),
+        xaxis=dict(gridcolor='lightgray'),
+        margin=dict(l=0, r=0, t=30, b=0),
         height=400,
         showlegend=True,
-        xaxis=dict(gridcolor='lightgray'),
-        yaxis=dict(gridcolor='lightgray'),
         plot_bgcolor='white'
     )
 
