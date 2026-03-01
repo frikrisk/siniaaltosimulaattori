@@ -3,31 +3,20 @@ import numpy as np
 import pandas as pd
 import time
 
-# 1. Sivun asetukset
 st.set_page_config(page_title="Aalto-laboratorio", layout="wide")
 
 if 'run' not in st.session_state:
     st.session_state.run = False
 
-st.title("🌊 Siniaaltojen simulaattori")
-
-# 2. Ohjauspaneeli sivupalkissa
-st.sidebar.header("⚙️ Ohjauspaneeli")
+st.title("🌊 Aalto-laboratorio")
 
 if st.sidebar.button('▶️ Käynnistä / ⏸️ Pysäytä'):
     st.session_state.run = not st.session_state.run
 
 v1 = st.sidebar.slider("Taajuus 1", 0.1, 10.0, 1.95)
-c1 = st.sidebar.selectbox("Väri 1", ['blue', 'green', 'teal', 'cyan'], index=0)
-
-st.sidebar.divider()
-
 v2 = st.sidebar.slider("Taajuus 2", 0.1, 10.0, 2.82)
-c2 = st.sidebar.selectbox("Väri 2", ['red', 'magenta', 'orange', 'gold'], index=0)
-
 speed = st.sidebar.slider("Päivitysviive (s)", 0.01, 0.20, 0.05)
 
-# 3. Mittarit ja paikka kuvaajalle
 col1, col2 = st.columns(2)
 m1 = col1.empty()
 m2 = col2.empty()
@@ -35,7 +24,6 @@ placeholder = st.empty()
 
 t = np.linspace(0, 2 * np.pi, 200)
 
-# 4. Animaatio ja logiikka
 if st.session_state.run:
     f = 0
     while st.session_state.run:
@@ -44,15 +32,12 @@ if st.session_state.run:
         y2 = np.sin(v2 * (t + off))
         y_sum = y1 + y2
         
-        # Päivitetään mittarit
         m1.metric("Aalto 1", f"{v1:.2f} Hz")
         m2.metric("Aalto 2", f"{v2:.2f} Hz")
         
-        # Luodaan data
         df = pd.DataFrame({'x': t, 'Aalto 1': y1, 'Aalto 2': y2, 'Summa': y_sum})
         df_m = df.melt('x', var_name='Aalto', value_name='y')
         
-        # Piirretään Vega-Lite (Tämä mahdollistaa värit ja katkoviivan)
         placeholder.vega_lite_chart(df_m, {
             'mark': {'type': 'line', 'clip': True},
             'encoding': {
@@ -63,7 +48,7 @@ if st.session_state.run:
                     'type': 'nominal',
                     'scale': {
                         'domain': ['Aalto 1', 'Aalto 2', 'Summa'],
-                        'range': [c1, c2, 'black']
+                        'range': ['blue', 'red', 'black']
                     }
                 },
                 'strokeDash': {
@@ -81,4 +66,8 @@ if st.session_state.run:
         f += 1
         time.sleep(speed)
 else:
-    placeholder.info("Simulaattori on pysäytetty. Paina Käynnistä-painiketta.")
+    placeholder.info("Simulaattori on tauolla. Paina Käynnistä.")
+    y1_s = np.sin(v1 * t)
+    y2_s = np.sin(v2 * t)
+    df_s = pd.DataFrame({'x': t, 'Aalto 1': y1_s, 'Aalto 2': y2_s, 'Summa': y1_s + y2_s})
+    placeholder.line_chart(df_s.set_index('x'))
