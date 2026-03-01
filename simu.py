@@ -35,33 +35,16 @@ if st.session_state.run:
         m1.metric("Aalto 1", f"{v1:.2f} Hz")
         m2.metric("Aalto 2", f"{v2:.2f} Hz")
         
-        df = pd.DataFrame({'x': t, 'Aalto 1': y1, 'Aalto 2': y2, 'Summa': y_sum})
-        df_m = df.melt('x', var_name='Aalto', value_name='y')
+        # Luodaan simppeli DataFrame
+        df = pd.DataFrame({
+            'Aika': t, 
+            'Aalto 1': y1, 
+            'Aalto 2': y2, 
+            'Summa': y_sum
+        }).set_index('Aika')
         
-        placeholder.vega_lite_chart(df_m, {
-            'mark': {'type': 'line', 'clip': True},
-            'encoding': {
-                'x': {'field': 'x', 'type': 'quantitative', 'scale': {'domain': [0, 6.28]}},
-                'y': {'field': 'y', 'type': 'quantitative', 'scale': {'domain': [-2.5, 2.5]}},
-                'color': {
-                    'field': 'Aalto', 
-                    'type': 'nominal',
-                    'scale': {
-                        'domain': ['Aalto 1', 'Aalto 2', 'Summa'],
-                        'range': ['blue', 'red', 'black']
-                    }
-                },
-                'strokeDash': {
-                    'field': 'Aalto',
-                    'type': 'nominal',
-                    'scale': {
-                        'domain': ['Aalto 1', 'Aalto 2', 'Summa'],
-                        'range': [,,]
-                    }
-                }
-            },
-            'height': 450
-        }, use_container_width=True)
+        # Käytetään Streamlitin kaikkein perinteisintä kuvaajaa
+        placeholder.line_chart(df)
         
         f += 1
         time.sleep(speed)
@@ -69,5 +52,6 @@ else:
     placeholder.info("Simulaattori on tauolla. Paina Käynnistä.")
     y1_s = np.sin(v1 * t)
     y2_s = np.sin(v2 * t)
-    df_s = pd.DataFrame({'x': t, 'Aalto 1': y1_s, 'Aalto 2': y2_s, 'Summa': y1_s + y2_s})
-    placeholder.line_chart(df_s.set_index('x'))
+    df_s = pd.DataFrame({'A1': y1_s, 'A2': y2_s, 'Sum': y1_s + y2_s})
+    placeholder.line_chart(df_s)
+    
