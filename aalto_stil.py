@@ -72,9 +72,8 @@ if st.session_state.run_animation:
                     'field': 'Aalto',
                     'type': 'nominal',
                     'scale': {
-                        'domain': ['Aalto 1', 'Aalto 2', 'Summa'],
-                        'range': [,,] # Summa on katkoviiva
-                    }
+                    'domain': ['Aalto 1', 'Aalto 2', 'Summa'],
+                    'range': [color1, color2, 'black']
                 }
             },
             'height': 450,
