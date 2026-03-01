@@ -49,12 +49,23 @@ while st.session_state.run_animation:
     fig.add_trace(go.Scatter(x=t, y=y_sum, name='Summa', line=dict(color='black', width=2, dash='dash')))
 
     fig.update_layout(
-        yaxis=dict(range=[-2.5, 2.5], gridcolor='lightgray'),
-        xaxis=dict(gridcolor='lightgray'),
+        yaxis=dict(
+            range=[-2.5, 2.5], 
+            fixedrange=True, # Estää skaalautumisen
+            gridcolor='lightgray'
+        ),
+        xaxis=dict(
+            range=[0, 2 * np.pi], 
+            fixedrange=True, # Estää sivuttaisen hyppimisen
+            gridcolor='lightgray'
+        ),
         margin=dict(l=0, r=0, t=30, b=0),
         height=400,
         showlegend=True,
-        plot_bgcolor='white'
+        plot_bgcolor='white',
+        # Nämä kaksi riviä poistavat Plotlyn omat animaatio-viiveet, jotka aiheuttavat nykimistä:
+        hovermode=False,
+        transition_duration=0 
     )
 
     plot_spot.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
